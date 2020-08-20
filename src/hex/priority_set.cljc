@@ -1,6 +1,6 @@
 (ns hex.priority-set
   "Simple implementation of Priority Set for hex.core/path-finder"
-  #?(:clj (:refer-clojure :exclude [peek pop!]))
+  (:refer-clojure :exclude [peek pop!])
   #?(:clj (:import (clojure.lang Counted Seqable)
                    (java.lang Object)))
   #?(:clj (:gen-class)))
@@ -13,8 +13,8 @@
   (get-data [_])
   (get-setp [_])
   (push! [this prio value]  "優先度付き push")
-  #?(:clj (peek [this] "Topを見る"))
-  #?(:clj (pop! [this] "トップを取り出す")))
+  (peek [this] "Topを見る")
+  (pop! [this] "トップを取り出す"))
 
 (defn- ps-push! [queue prio value]
   (let [data (get-data queue)
@@ -41,13 +41,13 @@
       obj)))
 
 #?(:cljs (deftype PrioritySet [data setp]
-           IStack
-           (-peek [coll] (first (second (first @data))))
 
            IPrioritySet
            (get-data [_] data)
            (get-setp [_] setp)
            (push! [queue priority value] (ps-push! queue priority value))
+           (peek [coll] (first (second (first @data))))
+           (pop! [this] (ps-pop! this))
 
            ICounted
            (^number -count [this] (count @setp))
@@ -55,10 +55,8 @@
            ISeqable
            (-seq [this] (if (empty? @setp)
                           nil
-                          (flatten (map #(seq (second %)) (seq @data)))))
+                          (flatten (map #(seq (second %)) (seq @data))))))
 
-           ITransientVector
-           (-pop! [this] (ps-pop! this)))
    :clj (deftype PrioritySet [data setp]
           IPrioritySet
           (get-data [_] data)
